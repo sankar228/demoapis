@@ -52,6 +52,7 @@ public class SecurityWebSecAdaptorConfiguration extends WebSecurityConfigurerAda
         http.authorizeRequests()
                 .antMatchers("/employee/fetchall/*", "/employee/fetch/*").authenticated()
                 .antMatchers("/employee/*").permitAll()
+                .antMatchers("/").permitAll()
                 .and().formLogin();
     }
 }

@@ -1,0 +1,33 @@
+
+schema{
+    query: Query
+}
+type Query{
+    allCrypto: [Crypto]
+    crypto(name: String): Crypto
+
+}
+
+type Crypto{
+    symbol: String
+    priceChange: String
+    priceChangePercent: String
+    weightedAvgPrice: String
+    prevClosePrice: String
+    lastPrice: String
+    lastQty: String
+    bidPrice: String
+    bidQty: String
+    askPrice: String
+    askQty: String
+    openPrice: String
+    highPrice: String
+    lowPrice: String
+    volume: String
+    quoteVolume: String
+    openTime: Float
+    closeTime: Float
+    firstId: Float
+    lastId: Float
+    count: Float
+}

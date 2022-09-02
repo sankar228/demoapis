@@ -40,32 +40,35 @@ public class JwtFilter extends OncePerRequestFilter {
         String tokenHeader = request.getHeader("Authorization");
         String username = null;
         String token = null;
-        if (tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
-            token = tokenHeader.substring(7);
-            try {
-                username = tokenManager.getUsernameFromToken(token);
-            } catch (IllegalArgumentException e) {
-                log.error("Unable to get JWT Token");
-            } catch (ExpiredJwtException e) {
-                log.error("JWT Token has expired", e);
-                throw new BadCredentialsException("Token expired");
-            }
+        if (request.getServletPath().equals("/api/cry") || request.getServletPath().equals("/query")) {
+            filterChain.doFilter(request, response);
         } else {
-            System.out.println("Bearer String not found in token");
-            // throw new BadCredentialsException("Unauthorized access");
-        }
-        if (null != username && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (tokenManager.validateJwtToken(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null,
-                        userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            if (tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
+                token = tokenHeader.substring(7);
+                try {
+                    username = tokenManager.getUsernameFromToken(token);
+                } catch (IllegalArgumentException e) {
+                    log.error("Unable to get JWT Token");
+                } catch (ExpiredJwtException e) {
+                    log.error("JWT Token has expired", e);
+                    throw new BadCredentialsException("Token expired");
+                }
+            } else {
+                System.out.println("Bearer String not found in token");
+                // throw new BadCredentialsException("Unauthorized access");
             }
+            if (null != username && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                if (tokenManager.validateJwtToken(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null,
+                            userDetails.getAuthorities());
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
+            }
+            filterChain.doFilter(request, response);
         }
-        filterChain.doFilter(request, response);
-
     }
 
 }

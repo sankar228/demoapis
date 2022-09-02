@@ -29,18 +29,21 @@ public class SecuritySecFilterChainConfigurer {
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // http.csrf().disable().authorizeRequests().antMatchers("/").permitAll();
 
-        http.csrf().disable()
-                .userDetailsService(myUserDetailsService)
-                .authorizeHttpRequests(
-                        (authz) -> authz.antMatchers("/login/**", "/login")
-                                .permitAll()
-                                .and()
-                                .antMatcher("/home/**"))
-                .httpBasic(Customizer.withDefaults())
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.csrf().disable();
+        http.userDetailsService(myUserDetailsService);
+        http.authorizeHttpRequests(
+                (authz) -> authz.antMatchers("/login/**", "/login", "/api/cry",
+                        "/api/cry/**", "/query")
+                        .permitAll()
+                        .and()
+                        .antMatcher("/home/**"));
+        http.httpBasic(Customizer.withDefaults());
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
